@@ -4,6 +4,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "cd src && npm install && node ./bin/www"
+    "start": "./deploy"
   }
 }
