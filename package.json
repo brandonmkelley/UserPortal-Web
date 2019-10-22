@@ -1,0 +1,9 @@
+
+{
+  "name": "userportal-web-launch",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "cd src && node ./bin/www"
+  }
+}
