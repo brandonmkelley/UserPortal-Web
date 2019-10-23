@@ -19,6 +19,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// Firebase App (the core Firebase SDK) is always required and
+// must be listed before other Firebase SDKs
+var firebase = require("firebase/app");
+
+// Add the Firebase products that you want to use
+require("firebase/auth");
+
+var firebaseConfig = require('./bin/firebaseconfig.js');
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+app.set('firebase', firebase);
+
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
