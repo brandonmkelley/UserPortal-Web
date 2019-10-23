@@ -24,3 +24,4 @@ openssl x509 -req -in ./bin/ssl-csr.pem -signkey ./bin/ssl-key.pem -out ./bin/ss
 
 # Start application
 npm start
+
