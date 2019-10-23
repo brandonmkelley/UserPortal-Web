@@ -1,26 +1,9 @@
 
-# Parameters
-csr_country='US'
-csr_state='Washington'
-csr_city='Everett'
-csr_company='N/A'
-csr_fqdn='userportal-web.azurewebsites.net'
-csr_email='brandonmkelley@outlook.com'
-
 # Set project directory
 cd src
 
 # Install dependencies
 npm install
-
-# Generate SSL private key
-openssl genrsa -out ./bin/ssl-key.pem 1024
-
-# Generate SSL certificate request
-echo -ne "$csr_country\n$csr_state\n$csr_state\n$csr_company\n\n$csr_fqdn\n$csr_email\n\n\n" | openssl req -new -key ./bin/ssl-key.pem -out ./bin/ssl-csr.pem
-
-# Generate SSL certificate
-openssl x509 -req -in ./bin/ssl-csr.pem -signkey ./bin/ssl-key.pem -out ./bin/ssl-cert.pem
 
 # Start application
 npm start
