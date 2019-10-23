@@ -1,11 +1,11 @@
 
 # Parameters
-csr_country = 'US'
-csr_state = 'Washington'
-csr_city = 'Everett'
-csr_company = 'N/A'
-csr_fqdn = 'userportal-web.azurewebsites.net'
-csr_email = 'brandonmkelley@outlook.com'
+csr_country='US'
+csr_state='Washington'
+csr_city='Everett'
+csr_company='N/A'
+csr_fqdn='userportal-web.azurewebsites.net'
+csr_email='brandonmkelley@outlook.com'
 
 # Set project directory
 cd src
