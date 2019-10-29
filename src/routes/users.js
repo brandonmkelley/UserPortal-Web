@@ -6,7 +6,8 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
-router.post('/', (req, res, next) => {
+router.post('/users', (req, res, next) => {
+    console.log('accessed.')
     var firebase = req.app.get('firebase');
     
     firebase.auth().createUserWithEmailAndPassword(req.body.email, req.body.password)
