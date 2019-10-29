@@ -21,11 +21,27 @@
 </form>
 
 <script>
+  var socket = io.connect('https://474134dfda5d4bec9144e2d75619ea24.vfs.cloud9.us-west-2.amazonaws.com/');
+
+  socket.on('sign-in-success', data => {
+    console.log(data);
+  });
+  
+  socket.on('sign-in-failure', data => {
+    console.log(data);
+  });
+
   $(document).ready(() => {
     $('#signup').click(e => {
       var email = $('#email').val();
       var password = $('#password').val();
 
+      socket.emit('sign-in-request', {
+        email: email,
+        password: password
+      });
+      
+      /*
       $.ajax({
         url: '/users',
         type: 'POST',
@@ -34,6 +50,7 @@
         success: alert,
         error: alert
       });
+      */
     });
     
     $('#login').click(e => {

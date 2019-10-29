@@ -4,9 +4,10 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('userportal-web:server');
 var http = require('http');
+var express = require('express');
+
+var app = express();
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,10 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+require('../app')(app, server);
+
+var debug = require('debug')('userportal-web:server');
 
 /**
  * Listen on provided port, on all network interfaces.
