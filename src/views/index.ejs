@@ -20,18 +20,12 @@
   <button id="logout" type="button" class="btn btn-danger">Logout</button>
 </form>
 
-<br/>
-
-Status: <p id="status"></p>
-
 <script>
   $(document).ready(() => {
     $('#signup').click(e => {
-      $('#status').text('Posting...');
-      
       var email = $('#email').val();
       var password = $('#password').val();
-      
+
       $.ajax({
         url: '/users',
         type: 'POST',
