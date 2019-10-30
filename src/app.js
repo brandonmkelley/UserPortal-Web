@@ -36,7 +36,7 @@ module.exports = (app, server) => {
   
   app.set('firebase', firebase);
   
-  var io = require('socket.io')(server);
+  var io = require('socket.io').listen(server);
   app.set('io', io);
   
   require('./api/auth')(app);
