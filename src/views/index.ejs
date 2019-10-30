@@ -1,6 +1,7 @@
 
 <h1><%= title %></h1>
-<p>Hello <%= user %>, welcome to <%= title %> at <%= contentName %> | UserPortal</p>
+
+<div>Current user: <span id="user">N/A</span></div>
 
 <br/>
 
@@ -22,39 +23,34 @@
 
 <script>
   var socket = io.connect('https://474134dfda5d4bec9144e2d75619ea24.vfs.cloud9.us-west-2.amazonaws.com/');
-
-  socket.on('sign-in-success', data => {
-    console.log(data);
-  });
   
-  socket.on('sign-in-failure', data => {
-    console.log(data);
-  });
+  socket.on('sign-up-failure', data => alert('Sign up failed, ' + data.message));
+  socket.on('log-in-failure', data => alert('Log in failed, ' + data.message));
+  socket.on('log-out-failure', data => alert('Log out failed, ' + data.message));
 
   $(document).ready(() => {
+    socket.on('auth-state-changed', user => $('#user').text(user ? user.email : 'N/A'));
+    
     $('#signup').click(e => {
       var email = $('#email').val();
       var password = $('#password').val();
 
-      socket.emit('sign-in-request', {
+      socket.emit('sign-up-request', {
         email: email,
         password: password
       });
-      
-      /*
-      $.ajax({
-        url: '/users',
-        type: 'POST',
-        contentType: 'application/json',
-        body: JSON.stringify({ email: email, password: password }),
-        success: alert,
-        error: alert
-      });
-      */
     });
     
     $('#login').click(e => {
-      alert('login clicked')
+      var email = $('#email').val();
+      var password = $('#password').val();
+
+      socket.emit('log-in-request', {
+        email: email,
+        password: password
+      });
     });
+    
+    $('#logout').click(e => socket.emit('log-out-request'));
   });
 </script>

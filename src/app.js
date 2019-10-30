@@ -9,8 +9,7 @@ module.exports = (app, server) => {
   var logger = require('morgan');
   
   var indexRouter = require('./routes/index');
-  var usersRouter = require('./routes/users');
-  
+
   // view engine setup
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'ejs');
@@ -40,26 +39,10 @@ module.exports = (app, server) => {
   var io = require('socket.io')(server);
   app.set('io', io);
   
-  io.on('connection', socket => {
-      socket.on('sign-in-request', data => {
-          
-        firebase.auth().createUserWithEmailAndPassword(data.email, data.password)
-          .then(result => {
-              if (result) {
-                  console.log(result);
-                  socket.emit('sign-in-success', result);
-              }
-          })
-          .catch(error => {
-              console.log(error);
-              socket.emit('sign-in-failure', error);
-          });
-      });
-  });
+  require('./api/auth')(app);
   
   app.use('/', indexRouter);
-  app.use('/users', usersRouter);
-  
+
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
     next(createError(404));
