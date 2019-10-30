@@ -22,7 +22,7 @@
 </form>
 
 <script>
-  var socket = io.connect('https://474134dfda5d4bec9144e2d75619ea24.vfs.cloud9.us-west-2.amazonaws.com/');
+  var socket = io.connect(window.location.origin);
   
   socket.on('sign-up-failure', data => alert('Sign up failed, ' + data.message));
   socket.on('log-in-failure', data => alert('Log in failed, ' + data.message));
