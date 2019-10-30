@@ -22,7 +22,7 @@
 </form>
 
 <script>
-  var socket = io.connect(window.location.origin);
+  var socket = io.connect(window.location.host);
   
   socket.on('sign-up-failure', data => alert('Sign up failed, ' + data.message));
   socket.on('log-in-failure', data => alert('Log in failed, ' + data.message));
