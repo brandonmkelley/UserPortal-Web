@@ -6,7 +6,6 @@ module.exports = (app) => {
   
   io.on('connection', socket => {
         socket.on('sign-up-request', data => {
-            console.log('hello sign up');
             var creds = JSON.parse(data);
             firebase.auth().createUserWithEmailAndPassword(creds.email, creds.password)
               .then(result => socket.emit('sign-up-success', JSON.stringify(result)))
@@ -26,7 +25,8 @@ module.exports = (app) => {
             .catch(error => socket.emit('log-out-failure', JSON.stringify(error)));
       });
       
-      firebase.auth().onAuthStateChanged(data => socket.emit('auth-state-changed', JSON.stringify(data)));
+      firebase.auth().onAuthStateChanged(data =>
+        socket.emit('auth-state-changed', data ? JSON.stringify(data) : null));
   });
     
 };
