@@ -14,12 +14,10 @@
     <input type="password" class="form-control" id="password" placeholder="Password">
   </div>
   
-  <div id="display-name-field" style="display: none;">
-    <div id="display-name-text" style="font-size: 16px; padding-top: 10px; padding-bottom: 10px; padding-left: 12px;">(None)</div>
+  <div id="display-name-field" style="display: none; height: 54px;">
+    <div id="display-name-text" style="font-size: 15px; padding-top: 10px; padding-left: 12px;">(None)</div>
     <input style="display: none;" type="text" class="form-control" id="display-name-input" placeholder="Display name">
   </div>
-  
-  <br/>
   
   <button id="signup" type="button" class="btn btn-primary">Sign-up</button>
   <button id="login" type="button" class="btn btn-success">Login</button>
@@ -34,17 +32,13 @@
   socket.on('log-out-failure', data => alert('Log out failed, ' + JSON.parse(data).message));
 
   $(document).ready(() => {
-    $('#display-name-text').click(e => {
-      $('#display-name-text').hide(0, e => {
-        $('#display-name-input').focusout(e => {
-          $('#display-name-input').hide(0, e => $('#display-name-text').show());
-        });
-        
-        $('#display-name-input').show();
-        $('#display-name-input').focus();
-      });
-    });
+    setupAuthListeners();
+    setupAuthEmitters();
     
+    setupDisplayNameField();
+  });
+  
+  function setupAuthListeners() {
     socket.on('auth-state-changed', data => {
       var user = JSON.parse(data);
       
@@ -53,10 +47,14 @@
         $('#user-welcome').show();
         $('#display-name-field').show();
       }
-      else
+      else {
         $('#user-welcome').hide();
+        $('#display-name-field').hide();
+      }
     });
-    
+  }
+  
+  function setupAuthEmitters() {
     $('#signup').click(e => {
       var email = $('#email').val();
       var password = $('#password').val();
@@ -78,5 +76,32 @@
     });
     
     $('#logout').click(e => socket.emit('log-out-request'));
-  });
+  }
+  
+  function setupDisplayNameField() {
+    // Allow editing.
+    $('#display-name-text').click(e => { // If text clicked, start editing.
+      $('#display-name-text').hide(0, e => { // Hide text element.
+        $('#display-name-input').show(); // Show the text input.
+        $('#display-name-input').focus();
+      });
+    });
+    
+    // Allow saving.
+    $('#display-name-input').focusout(e => { // If input unfocused, stop editing and save.
+      socket.emit('send-update-user', JSON.stringify({ displayName: $('#display-name-input').val() }));
+      $('#display-name-input').hide(0, e => $('#display-name-text').show());
+    });
+    
+    // Allow update from remote edit.
+    socket.on('receive-update-user', data => {
+      var userUpdate = JSON.parse(data);
+      console.log(userUpdate);
+      
+      if (userUpdate.hasOwnProperty('displayName')) {
+        $('#display-name-text').val(userUpdate.displayName);
+        $('#display-name-input').val(userUpdate.displayName);
+      }
+    });
+  }
 </script>
