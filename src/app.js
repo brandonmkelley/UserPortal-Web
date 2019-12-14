@@ -7,7 +7,10 @@ module.exports = (app, server) => {
   var cookieParser = require('cookie-parser');
   var bodyParser = require('body-parser');
   var logger = require('morgan');
-  
+  var session = require('express-session');
+  var FirebaseStore = require('connect-session-firebase')(session);
+  var firebaseAdmin = require('firebase-admin');
+
   var indexRouter = require('./routes/index');
 
   // view engine setup
@@ -22,19 +25,40 @@ module.exports = (app, server) => {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(express.static(path.join(__dirname, 'public')));
   
-  // Firebase App (the core Firebase SDK) is always required and
-  // must be listed before other Firebase SDKs
-  var firebase = require("firebase/app");
+  var firebaseAdminRef = firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert('./bin/firebaseServiceAccount.json'),
+    databaseURL: 'https://userportal-fa7ab.firebaseio.com'
+  });
+ 
+  app.use(session({
+    store: new FirebaseStore({
+      database: firebaseAdminRef.database()
+    }),
+    secret: 'keyboard catz',
+    resave: true,
+    saveUninitialized: true
+  }));
   
-  // Add the Firebase products that you want to use
-  require("firebase/auth");
-  
-  var firebaseConfig = require('./bin/firebaseconfig.js');
-  
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  
-  app.set('firebase', firebase);
+  // Add a firebase instance per session.
+  app.use((req, res, next) => {
+    if (!req.session.firebase) {
+      // Firebase App (the core Firebase SDK) is always required and
+      // must be listed before other Firebase SDKs
+      var firebase = require("firebase/app");
+      
+      // Add the Firebase products that you want to use
+      require("firebase/auth");
+      
+      var firebaseConfig = require('./bin/firebaseconfig.js');
+      
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      req.session.firebase = firebase;
+    }
+    
+    next();
+  });
   
   var io = require('socket.io').listen(server);
   app.set('io', io);
