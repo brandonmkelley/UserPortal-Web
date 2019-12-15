@@ -36,6 +36,8 @@
     setupAuthEmitters();
     
     setupDisplayNameField();
+    
+    socket.emit('begin-auth');
   });
   
   function setupAuthListeners() {

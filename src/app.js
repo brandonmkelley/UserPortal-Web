@@ -8,6 +8,7 @@ module.exports = (app, server) => {
   var bodyParser = require('body-parser');
   var logger = require('morgan');
   var session = require('express-session');
+  var sharedSession = require('express-socket.io-session');
   var FirebaseStore = require('connect-session-firebase')(session);
   var firebaseAdmin = require('firebase-admin');
 
@@ -28,39 +29,48 @@ module.exports = (app, server) => {
   var firebaseAdminRef = firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert('./bin/firebaseServiceAccount.json'),
     databaseURL: 'https://userportal-fa7ab.firebaseio.com'
-  });
+  }, 'ADMIN');
  
-  app.use(session({
+  var expressSession = session({
     store: new FirebaseStore({
       database: firebaseAdminRef.database()
     }),
     secret: 'keyboard catz',
     resave: true,
     saveUninitialized: true
-  }));
+  });
   
-  // Add a firebase instance per session.
-  app.use((req, res, next) => {
-    if (!req.session.firebase) {
+  app.use(expressSession);
+  
+  var io = require('socket.io').listen(server);
+  
+  io.use(sharedSession(expressSession));
+  
+  var firebase = require("firebase/app");
+      
+  // Add the Firebase products that you want to use
+  require("firebase/auth");
+  
+  app.set('firebase', firebase);
+  
+  io.on('connection', socket => {
+    if (!socket.handshake.session.firebaseInitialized) {
       // Firebase App (the core Firebase SDK) is always required and
       // must be listed before other Firebase SDKs
-      var firebase = require("firebase/app");
-      
-      // Add the Firebase products that you want to use
-      require("firebase/auth");
       
       var firebaseConfig = require('./bin/firebaseconfig.js');
       
       // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-
-      req.session.firebase = firebase;
+      var firebaseApp = firebase.initializeApp(firebaseConfig, socket.handshake.sessionID);
+      
+      app.set('firebaseApp-' + socket.handshake.sessionID, firebaseApp);
+      console.log(firebaseApp);
+      
+      socket.handshake.session.firebaseInitialized = true;
+      socket.handshake.session.save();
     }
-    
-    next();
   });
   
-  var io = require('socket.io').listen(server);
   app.set('io', io);
   
   require('./api/auth')(app);
