@@ -64,8 +64,7 @@ module.exports = (app, server) => {
       var firebaseApp = firebase.initializeApp(firebaseConfig, socket.handshake.sessionID);
       
       app.set('firebaseApp-' + socket.handshake.sessionID, firebaseApp);
-      console.log(firebaseApp);
-      
+
       socket.handshake.session.firebaseInitialized = true;
       socket.handshake.session.save();
     }
