@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "BUILD_FLAGS=Off node ./bin/www"
+    "start": "ENABLE_ORYX_BUILD=false node ./bin/www"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
