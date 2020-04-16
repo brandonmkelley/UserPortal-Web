@@ -1,11 +1,14 @@
 
 <h1><%= title %></h1>
 
-<div id="user-welcome" style="display: none;">Welcome, <span id="user">N/A</span></div>
+<div id="user-welcome" style="display: none;">
+	<div class="d-inline-block pr-3">Welcome, <span id="user"></span></div>
+  <button id="logout" type="button" class="btn btn-danger">Logout</button>
+</div>
 
 <br/>
 
-<form>
+<form id="user-auth">
   <div class="form-group">
     <input type="email" class="form-control" id="email" placeholder="Email">
   </div>
@@ -13,16 +16,16 @@
   <div class="form-group">
     <input type="password" class="form-control" id="password" placeholder="Password">
   </div>
-  
-  <div id="display-name-field" style="display: none; height: 54px;">
-    <div id="display-name-text" style="font-size: 15px; padding-top: 10px; padding-left: 12px;">(None)</div>
-    <input style="display: none;" type="text" class="form-control" id="display-name-input" placeholder="Display name">
-  </div>
-  
+   
   <button id="signup" type="button" class="btn btn-primary">Sign-up</button>
   <button id="login" type="button" class="btn btn-success">Login</button>
-  <button id="logout" type="button" class="btn btn-danger">Logout</button>
 </form>
+
+<div id="display-name-field" style="display: none; height: 54px;">
+  <div class="mb-2">Display Name</div>
+  <div id="display-name-text" style="font-size: 15px; padding-top: 10px; padding-left: 12px;">(None)</div>
+  <input style="display: none;" type="text" class="form-control" id="display-name-input" placeholder="Display name">
+</div>
 
 <script>
   var socket = io.connect(window.location.host);
@@ -45,6 +48,8 @@
       var user = JSON.parse(data);
       
       if (user) {
+        console.log(user);
+	$('#user-auth').hide();
         $('#user').text(user.email);
         $('#user-welcome').show();
         $('#display-name-field').show();
@@ -52,6 +57,7 @@
       else {
         $('#user-welcome').hide();
         $('#display-name-field').hide();
+	$('#user-auth').show();
       }
     });
   }
@@ -91,14 +97,15 @@
     
     // Allow saving.
     $('#display-name-input').focusout(e => { // If input unfocused, stop editing and save.
-      socket.emit('send-update-user', JSON.stringify({ displayName: $('#display-name-input').val() }));
+      var displayName = $('#display-name-input').val();
+      socket.emit('send-update-user', JSON.stringify({ displayName: displayName }));
+      $('#display-name-text').html(displayName == '' ? '(None)' : displayName);
       $('#display-name-input').hide(0, e => $('#display-name-text').show());
     });
     
     // Allow update from remote edit.
     socket.on('receive-update-user', data => {
       var userUpdate = JSON.parse(data);
-      console.log(userUpdate);
       
       if (userUpdate.hasOwnProperty('displayName')) {
         $('#display-name-text').val(userUpdate.displayName);
